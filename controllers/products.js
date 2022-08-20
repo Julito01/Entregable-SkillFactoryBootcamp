@@ -1,50 +1,35 @@
 import { response } from 'express';
 import fetch from 'node-fetch';
 
+import { createArrays } from '../helpers/products-functions.js';
+import { HttpClient } from '../helpers/http-client.js';
+
+const httpClient = new HttpClient();
 const apiURL = 'https://fakestoreapi.com';
 
+export const getAllProducts = async (req, res = response) => {
+  const data = await httpClient.get(`${apiURL}/products`);
+  return res.json(data);
+};
+
+export const getProductByID = async (req, res = response) => {
+  try {
+    const { id } = req.params;
+    const data = await httpClient.get(`${apiURL}/products/${id}`);
+    return res.json(data);
+  } catch (error) {
+    res.json(error);
+  }
+};
+
 const getCategories = async () => {
-  const categories = await fetch(`${apiURL}/products/categories`).then((res) =>
-    res.json()
-  );
+  const categories = await httpClient.get(`${apiURL}/products/categories`);
 
   const productsByCategory = categories.map(async (category) => {
-    return await fetch(`${apiURL}/products/category/${category}`).then((res) =>
-      res.json()
-    );
+    return await httpClient.get(`${apiURL}/products/category/${category}`);
   });
 
   return productsByCategory;
-};
-
-const createArrays = (products) => {
-  const arrays = {
-    electronicProducts: [],
-    jewerelyProducts: [],
-    menProducts: [],
-    womenProducts: [],
-  };
-
-  products.forEach((element) => {
-    element.forEach((product) => {
-      switch (product.category) {
-        case 'electronics':
-          arrays.electronicProducts.push(product);
-          break;
-        case 'jewelery':
-          arrays.jewerelyProducts.push(product);
-          break;
-        case "men's clothing":
-          arrays.menProducts.push(product);
-          break;
-        case "women's clothing":
-          arrays.womenProducts.push(product);
-          break;
-      }
-    });
-  });
-
-  return arrays;
 };
 
 export const getProductsByCategory = async (req, res = response) => {
