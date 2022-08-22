@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 
-import { productsRouter } from '../routes/index.js';
+import { productsRouter, cartsRouter } from '../routes/index.js';
 import { reqDate } from '../middlewares/date.js';
 
 export const app = express();
@@ -12,7 +12,7 @@ class Server {
     this.port = 3000;
     this.paths = {
       products: '/products',
-      cart: '/cart',
+      carts: '/carts',
       users: '/users',
     };
     this.middlewares();
@@ -28,6 +28,7 @@ class Server {
 
   routes() {
     this.app.use(this.paths.products, productsRouter);
+    this.app.use(this.paths.carts, cartsRouter);
     this.app.all('*', (req, res) => {
       res.status(404).send('<h1>404! Ese endpoint no existe</h1>');
     });
